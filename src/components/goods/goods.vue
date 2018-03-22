@@ -15,7 +15,7 @@
         <li v-for="(item, index) in goods" class="food-list food-list-hook" :key="index">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="(food, index) in item.foods " :key="index" class="food-item">
+            <li @click="selectFood(food, $event)" v-for="(food, index) in item.foods " :key="index" class="food-item">
               <div class="icon">
                 <img width="57" height="57" :src="food.icon">
               </div>
@@ -31,7 +31,8 @@
                                                                 v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                 </div>
                 <div class="cartcontrol-wrapper">
-                  <cartcontrol :food="food"></cartcontrol>
+                  <cartcontrol :food="food">
+                  </cartcontrol>
                 </div>
               </div>
             </li>
@@ -39,7 +40,10 @@
         </li>
       </ul>
     </div>
-    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice">
+    </shopcart>
+    <food :food="selectedFood" ref="food">
+    </food>
   </div>
 </template>
 
@@ -47,6 +51,7 @@
   import BScroll from 'better-scroll';
   import shopcart from '../shopcart/shopcart';
   import cartcontrol from '../cartcontrol/cartcontrol';
+  import food from '../food/food';
 
   const ERR_OK = 0;
   export default {
@@ -59,7 +64,8 @@
       return {
         goods: [],
         listHeight: [],
-        scrollY: 0
+        scrollY: 0,
+        selectedFood: {}
       };
     },
     computed: {
@@ -72,6 +78,17 @@
           }
         }
         return 0;
+      },
+      selectFoods() {
+        let foods = [];
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food);
+            }
+          });
+        });
+        return foods;
       }
     },
     created() {
@@ -98,6 +115,13 @@
         let el = foodList[index];
         this.foodsScroll.scrollToElement(el, 300); // 参数2为动画时间
         // console.log(index);
+      },
+      selectFood(food, event) {
+        if (!event._constructed) {
+          return;
+        }
+        this.selectedFood = food;
+        this.$refs.food.show();
       },
       _initScroll() {
         this.menuScroll = new BScroll(this.$refs.menuWrapper, {
@@ -126,7 +150,8 @@
     },
     components: {
       shopcart,
-      cartcontrol
+      cartcontrol,
+      food
     }
   };
 </script>
