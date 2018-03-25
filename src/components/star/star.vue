@@ -69,7 +69,7 @@
       .star-item
         width: 15px
         height: 15px
-        margin-right: 16px
+        margin-right: 8px
         background-size: 15px 15px
         &:last-child // 最后一颗星不需要margin-right
           margin-right: 0
